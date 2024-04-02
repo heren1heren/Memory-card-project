@@ -1,0 +1,49 @@
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.logo {
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: filter 300ms;
+}
+.logo:hover {
+    filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+    filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.cat-image {
+    background-image: url(https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.6wwjXfND-JMMJ8WPEPDukwHaEK%26pid%3DApi&f=1&ipt=66b41b60460c3c491392b29a42b500ee096625f7a09f9cce040fbe10fb0a6382&ipo=images);
+    background-position: center;
+    background-size: cover;
+    height: 300px;
+    width: 300px;
+}
+@keyframes logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    a:nth-of-type(2) .logo {
+        animation: logo-spin infinite 20s linear;
+    }
+}
+
+.card {
+    padding: 2em;
+}
+
+.read-the-docs {
+    color: #888;
+}
