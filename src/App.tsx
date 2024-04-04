@@ -17,11 +17,7 @@ export function App() {
   return (
     <div id="app">
       <Header currentScore={currentScore} bestScore={bestScore} />
-      <Main
-        setCurrentScore={setCurrentScore}
-        currentScore={currentScore}
-        setBestScore={setBestScore}
-      />
+      <Main setCurrentScore={setCurrentScore} currentScore={currentScore} />
     </div>
   );
 }
@@ -44,22 +40,40 @@ function Header({ currentScore, bestScore }) {
   );
 }
 
-function Main({ currentScore, setCurrentScore, setBestScore }) {
+function Main({ currentScore, setCurrentScore }) {
   const [list, setList] = useState([]);
 
-  const [pickedPokemon, setPickedPokemon] = useState([]);
-
-  const handleCardClick = () => {
-    // shuffle the list -> re-render the main section
-    // add clicked pokemon inside pickedPokemon.
-    // if the current clicked pokemon is inside pickedPokemon -> reset score
-    setCurrentScore(currentScore + 1);
+  const [pickedPokemon, setPickedPokemon] = useState(['']);
+  const checkingExistingCard = (target: string) => {
+    for (let i = 0; i < pickedPokemon.length; i++) {
+      if (pickedPokemon[i] === target) {
+        return true;
+      }
+    }
+    return false;
   };
-  const renderList = (array: object[]) => {
-    return array.map((e) => {
+  const handleCardClick = (e) => {
+    // shuffle the list -> re-render the main section
+    setList(returnShuffleArray(list));
+
+    if (checkingExistingCard(e.currentTarget.id)) {
+      setCurrentScore(0);
+      setPickedPokemon(['template']);
+    } else {
+      setPickedPokemon([...pickedPokemon, e.currentTarget.id]);
+      setCurrentScore(currentScore + 1);
+    }
+  };
+  const renderList = (list: object[]) => {
+    return list.map((e) => {
       return (
-        <li key={e.name} className="card" onClick={handleCardClick}>
-          <img src={e.imgId} alt={e.name} className="card-img" />
+        <li
+          key={e.imgSrc}
+          className={`card `}
+          id={e.name}
+          onClick={handleCardClick}
+        >
+          <img src={e.imgSrc} alt={e.name} className="card-img" />
           <p className="card-name"> {e.name}</p>
         </li>
       );
@@ -67,28 +81,36 @@ function Main({ currentScore, setCurrentScore, setBestScore }) {
   };
 
   useEffect(() => {
-    let array = [];
-    const fetchPokemonImageAndName = async () => {
-      const response = await fetch(
-        'https://pokeapi.co/api/v2/pokemon?limit=10'
-      );
-      const result = await response.json();
-      if (result) {
-        array = result.results;
+    const array = [];
+    const checkingDuplicatedElement = (target) => {
+      for (let i = 0; i < array.length; i++) {
+        // console.log(array[i].id);
 
-        const promiseArray = array.map(async (pokemon) => {
-          const name = pokemon.name;
-          const IdResponse = await fetch(pokemon.url);
-          const IdResult = await IdResponse.json();
-          const imgId = IdResult.sprites.front_default;
-
-          return { name, imgId }; // return promises list
-        });
-        const extractedArray = await Promise.all(promiseArray);
-
-        // after extracting name and image
-        setList(extractedArray);
+        if (array[i].id === target.id) {
+          return true;
+        }
       }
+      return false;
+    };
+    const fetchPokemonImageAndName = async () => {
+      for (let i = 0; i < 12; i++) {
+        const randomSeed = Math.round(Math.random() * 200);
+        const response = await fetch(
+          `https://pokeapi.co/api/v2/pokemon/${randomSeed}/`
+        );
+        const result = await response.json();
+
+        if (result && !checkingDuplicatedElement(result)) {
+          array.push({
+            name: result.name,
+            id: result.id,
+            imgSrc: result.sprites.front_default,
+          });
+        } else {
+          console.log('duplicating');
+        }
+      }
+      setList(array);
     };
     fetchPokemonImageAndName();
   }, []); // how to only call useEffect once
